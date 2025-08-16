@@ -2,15 +2,14 @@ import re
 import string
 import nltk
 from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize, RegexpTokenizer
+from nltk.tokenize import RegexpTokenizer
 from nltk.stem import WordNetLemmatizer
 
-# Initialize RegexpTokenizer as fallback
+# Initialize tokenizer (using RegexpTokenizer instead of word_tokenize to avoid punkt_tab warnings)
 WORD_TOKENIZER = RegexpTokenizer(r'\w+')
 
 # Download necessary NLTK resources
 try:
-    nltk.download('punkt')
     nltk.download('stopwords')
     nltk.download('wordnet')
 except Exception as e:
@@ -52,12 +51,8 @@ def preprocess_text(text):
     # Remove extra whitespaces
     text = re.sub(r'\s+', ' ', text).strip()
     
-    # Tokenize with fallback
-    try:
-        tokens = word_tokenize(text)
-    except Exception as e:
-        print(f"Warning: Using fallback tokenizer due to error: {str(e)}")
-        tokens = WORD_TOKENIZER.tokenize(text)
+    # Tokenize text
+    tokens = WORD_TOKENIZER.tokenize(text)
     
     # Remove stopwords and lemmatize
     filtered_tokens = [LEMMATIZER.lemmatize(token) for token in tokens if token not in STOP_WORDS and len(token) > 1]
@@ -81,7 +76,7 @@ def extract_keywords(text, n=1):
     if not text:
         return []
     
-    tokens = word_tokenize(text)
+    tokens = WORD_TOKENIZER.tokenize(text)
     keywords = []
     
     for i in range(len(tokens) - n + 1):
